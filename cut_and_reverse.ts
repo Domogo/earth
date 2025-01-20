@@ -37,5 +37,5 @@ export async function cut_and_reverse(inputImage: sharp.Sharp, numColumns: numbe
     currentLeft += columnWidth;
   }
 
-  return newImage.composite(composites);
+  return newImage.composite(composites).png();
 }
