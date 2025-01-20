@@ -6,8 +6,6 @@ async function main() {
   const numColumns = 12;
 
   try {
-    await fs.mkdir('test', { recursive: true }); 
-
     const image = await sharp(imagePath).metadata();
     const width = image.width!;
     const height = image.height!;
@@ -23,27 +21,8 @@ async function main() {
       const columnBuffer = await sharp(imagePath)
         .extract({ left, top: 0, width: w, height })
         .toBuffer();
-      const columnMeta = await sharp(columnBuffer).metadata();
-
-      // Create a new image with transparent background
-      const newColumn = await sharp({
-        create: {
-          width: width,
-          height: height,
-          channels: 4,
-          background: { r: 0, g: 0, b: 0, alpha: 0 },
-        },
-      })
-        .composite([{ input: columnBuffer, left: left, top: 0 }])
-        .png() 
-        .toBuffer();
-
-      await sharp(newColumn).png().toFile(`test/column_${i + 1}.png`); 
-      columns.push(newColumn);
-      console.log(`Column ${i + 1}: left=${left}, width=${columnMeta.width}, height=${columnMeta.height}, buffer size: ${columnBuffer.length}`);
+      columns.push(columnBuffer);
     }
-
-    const reversedColumns = columns.reverse();
 
     const newImage = await sharp({
       create: {
@@ -55,18 +34,20 @@ async function main() {
     });
 
     let currentLeft = 0;
-    for (let i = 0; i < reversedColumns.length; i++) {
-      const column = reversedColumns[i];
+    let composites = []
+    for (let i = 0; i < columns.length; i++) { 
+      const column = columns[numColumns - 1 - i];
       const columnMeta = await sharp(column).metadata();
       const colWidth = columnMeta.width;
       console.log(`Compositing column ${i+1}, currentLeft: ${currentLeft}, columnWidth: ${colWidth}, buffer size: ${column.length}`);
       if (colWidth) { 
-        newImage.composite([{ input: column, left: currentLeft, top: 0 }]);
+        composites.push({ input: column, left: currentLeft, top: 0 });
         currentLeft += colWidth;
       }
     }
 
-    await newImage.png().toFile('reversed_image.png'); 
+
+    await newImage.composite(composites).png().toFile('img/2025-01-19/reversed/reversed_image.png'); 
     console.log('Image processed successfully!');
   } catch (error) {
     console.error('Error processing image:', error);
