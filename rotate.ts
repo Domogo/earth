@@ -1,15 +1,10 @@
 import sharp from 'sharp';
 
-async function rotateImage() {
+export async function rotateImage(image: sharp.Sharp): Promise<sharp.Sharp> {
   try {
-    const rotatedImage = await sharp('img/2025-01-19/reversed/reversed_image.png')
-      .rotate(90)
-      .toFile('img/2025-01-19/rotated/output.png');
-    console.log('Image rotated and saved successfully!');
+    return await image.rotate(90);
   } catch (error) {
     console.error('Error rotating image:', error);
+    throw error;
   }
 }
-
-rotateImage();
-rotateImage();
