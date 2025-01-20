@@ -1,4 +1,3 @@
-import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
 
 async function main() {
@@ -26,7 +25,7 @@ async function main() {
 
     const newImage = await sharp({
       create: {
-        width: width,
+        width: columnWidth * numColumns,
         height: height,
         channels: 4,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
@@ -37,13 +36,8 @@ async function main() {
     let composites = []
     for (let i = 0; i < columns.length; i++) { 
       const column = columns[numColumns - 1 - i];
-      const columnMeta = await sharp(column).metadata();
-      const colWidth = columnMeta.width;
-      console.log(`Compositing column ${i+1}, currentLeft: ${currentLeft}, columnWidth: ${colWidth}, buffer size: ${column.length}`);
-      if (colWidth) { 
-        composites.push({ input: column, left: currentLeft, top: 0 });
-        currentLeft += colWidth;
-      }
+      composites.push({ input: column, left: currentLeft, top: 0 });
+      currentLeft += columnWidth;
     }
 
 
