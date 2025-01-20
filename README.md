@@ -12,4 +12,17 @@ To run:
 bun run index.ts
 ```
 
-This project was created using `bun init` in bun v1.1.25. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Requirements:
+
+```
+brew install ffmpeg
+```
+
+Functions:
+
+```
+fetch_image.ts - get Earth images from NASA
+
+generate_gifs.sh - generate gifs for a date argument
+```
+
